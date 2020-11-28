@@ -1,69 +1,100 @@
 import java.util.*;
+
 public class Answer1 {
-    public static void main(String[] args) {
-
-        int n;
-        Scanner in = new Scanner(System.in);
-        n = in.nextInt();
-        in.nextLine();
-        String[] crops = new String[n];
-        for (int i = 0; i < n; i++) {
-            crops[i] = in.nextLine().trim();
-        }
-
-        System.out.print(replant(crops));
-    }
-
-    public static int replant(String[] crops) {
-        // Write your code here
-        // Return the number of replanted crops
-        int len = crops.length;
-        String duplicate_crop[] = new String[len];
-        for (int i = 0; i < len; ++i) {
-            StringBuilder copy_crop = new StringBuilder(crops[i]);
-            duplicate_crop[i] = copy_crop.reverse().toString();
-        }
-        int first_var = fun(crops);
-        int second_var = fun(duplicate_crop);
-        return (first_var > second_var) ? second_var : first_var;
-    }
-
-    public static int fun(String[] crops) {
-        int dimension_x = crops.length;
-        int dimension_y = crops[0].length();
-        int crop_copy[][] = new int[dimension_x][dimension_y];
-        for (int i = 0; i < dimension_x; ++i)
-            Arrays.fill(crop_copy[i], 0);
-        crop_copy[0][0] = 0;
-        for (int i = 1; i < dimension_x; ++i) {
-            crop_copy[i][0] = crop_copy[i - 1][0];
-            if (crops[i].charAt(0) != ' ' && crops[i].charAt(0) == crops[i - 1].charAt(0)) {
-                crop_copy[i][0] = 1 + crop_copy[i][0];
-                String abc = crops[i];
-                abc = ' ' + abc.substring(1);
-                crops[i] = abc;
+    static int findChanges(char[][] cropField,int n,int m)
+    {
+        char [][]tempField=new char[n][m];
+        int changes=0;
+        tempField[0][0]=cropField[0][0];
+        for(int j=1;j<m;j++)
+        {
+            if(cropField[0][j]==tempField[0][j-1])
+            {
+                for(int k=0;k<26;k++)
+                {
+                    if((char)(97+k)!=tempField[0][j-1] && (j==m-1 || (char)(97+k)!=cropField[0][j+1]) && (char)(97+k)!=cropField[1][j])
+                    {
+                        tempField[0][j]=(char)(97+k);
+                        k=26;
+                    }
+                }
+                changes++;
+            }
+            else
+            {
+                tempField[0][j]=cropField[0][j];
             }
         }
-        for (int i = 1; i < dimension_y; ++i) {
-            crop_copy[0][i] = crop_copy[0][i - 1];
-            if (crops[0].charAt(i) != ' ' && crops[0].charAt(i) == crops[0].charAt(i - 1)) {
-                crop_copy[0][i] = 1 + crop_copy[0][i];
-                String abc = crops[0];
-                abc = abc.substring(0, i) + ' ' + abc.substring(i + 1);
-                crops[0] = abc;
+        for(int i=1;i<n;i++)
+        {
+            if(cropField[i][0]==tempField[i-1][0])
+            {
+                for(int k=0;k<26;k++)
+                {
+                    if((char)(97+k)!=tempField[i-1][0] && (i==n-1 || (char)(97+k)!=cropField[i+1][0]) && (char)(97+k)!=cropField[i][1])
+                    {
+                        tempField[i][0]=(char)(97+k);
+                        k=26;
+                    }
+                }
+                changes++;
             }
+            else
+            {
+                tempField[i][0]=cropField[i][0];
+            }   
         }
-        for (int i = 1; i < dimension_x; ++i) {
-            for (int j = 1; j < dimension_y; ++j) {
-                crop_copy[i][j] = crop_copy[i - 1][j] + crop_copy[i][j - 1] - crop_copy[i - 1][j - 1];
-                if ((crops[i].charAt(j) == crops[i].charAt(j - 1)) || (crops[i].charAt(j) == crops[i - 1].charAt(j))) {
-                    crop_copy[i][j] = 1 + crop_copy[i][j];
-                    String abc = crops[i];
-                    abc = abc.substring(0, j) + ' ' + abc.substring(j + 1);
-                    crops[i] = abc;
+        for(int i=1;i<n;i++)
+        {
+            for(int j=1;j<m;j++)
+            {
+                if(cropField[i][j]==tempField[i-1][j] || cropField[i][j]==tempField[i][j-1])
+                {
+                    for(int k=0;k<26;k++)
+                    {
+                        if((char)(97+k)!=tempField[i-1][j] && (char)(97+k)!=tempField[i][j-1] && (i==n-1 || (char)(97+k)!=cropField[i+1][j]) && (j==m-1 || (char)(97+k)!=cropField[i][j+1]))
+                        {
+                            tempField[i][j]=(char)(97+k);
+                            k=26;
+                        }
+                    }
+                    changes++;
+                }
+                else
+                {
+                    tempField[i][j]=cropField[i][j];
                 }
             }
         }
-        return crop_copy[dimension_x - 1][dimension_y - 1];
+
+        /*for(int i=0;i<n;i++)
+        {
+            for(int j=0;j<m;j++)
+            {
+                System.out.print(tempField[i][j]);
+            }
+        }*/
+        return changes;
     }
+   public static void main(String[] args)
+   {
+       Scanner sc=new Scanner(System.in);
+       System.out.print("Enter rows:");
+       int n=sc.nextInt();
+       System.out.print("Enter columns:");
+       int m=sc.nextInt();
+       char [][]cropField=new char[n][m];
+       for(int i=0;i<n;i++)
+       {
+           System.out.print("Enter row "+i+"(size "+m+"):");
+           String rowI=sc.next();
+           //System.out.println(rowI);
+           for(int j=0;j<m;j++)
+           {
+                cropField[i][j]=rowI.charAt(j);
+           }
+       }
+       int result=findChanges(cropField,n,m);
+       System.out.println("TOTAL CHANGES REQUIRED:"+result);
+   } 
 }
